@@ -7,7 +7,7 @@ export default async function ChatInputCommandHandler(client: Client, interactio
   catch (error) {
     console.error(error);
     await interaction.reply({
-      content: 'There was an error while executing this command!',
+      content: 'There was an error while executing this command! contect to Admin',
       ephemeral: true
     });
   }

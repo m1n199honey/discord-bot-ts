@@ -55,7 +55,8 @@ export default async function () {
             ) {
                 process.stdout.write(getAnsiColorCode(item));
             } else {
-                process.stdout.write(item);
+                if (item === 'string') process.stdout.write(item);
+                else process.stdout.write(item?.toString());
             }
         }
         process.stdout.write('\x1b[0m\n'); // Reset color and move to the next line
@@ -67,3 +68,4 @@ export default async function () {
     console.log("#001", "CHANNEL_ID: ", "#aa5555", config.CHANNEL_ID)
     console.log("#001", "PREFIX: ", "#aabb00", config.PREFIX)
 }
+

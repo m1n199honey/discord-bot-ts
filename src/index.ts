@@ -1,33 +1,43 @@
 import path from "path";
-import { Client, GatewayIntentBits, SlashCommandBuilder, Routes } from "discord.js";
 import { REST } from '@discordjs/rest';
 
+import { Client, GatewayIntentBits, SlashCommandBuilder, Routes } from "discord.js";
 const client = new Client({
     intents: [
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.DirectMessages
+        GatewayIntentBits.Guilds, // Required for basic guild operations
+        GatewayIntentBits.GuildMessages, // Required for receiving and responding to messages
+        GatewayIntentBits.DirectMessages, // Required for private messaging
+        GatewayIntentBits.MessageContent, // To access the full content of messages, Attachments(images, files, etc. Embed Reaction Mention Edited message Deleted messages
     ]
 });
 
 import("./init").then(async (i) => {
     await i.default(); const { config } = i;
+
     if (config.TOKEN && config.SERVER_ID && config.BOT_ID){
         await i.SetEvents(path.join(__dirname, "events"), client);
         await i.SetCommands(path.join(__dirname, "commands"), client);
+
         if(config.DEPLOY == 'yes'){ 
+
+        // ######  Deploy Commands ############## ---------------------------------
+
             const rest = new REST({ version: '10' }).setToken(config.TOKEN);
             const commands = await i.SetCommandsJSON(path.join(__dirname, "commands"));
             if(!config.SERVER_ID) return console.log("#ff0000", "Guild ID not provided for command deployment");
             rest.put(Routes.applicationGuildCommands(config.BOT_ID, config.SERVER_ID), {body: commands})
-                .then(() => console.log("#22bb11", 'Successfully registered application commands.'))
+                .then(() => {
+                    console.log("#22bb11", 'Successfully registered application commands.'); 
+                    client.login(config.TOKEN);
+                })
                 .catch(console.error);
+
+        // ######  Deploy Commands ############## -----------------------------------
 
         } else if (config.DEPLOY == 'no') {
             console.log("#aa1111", "no command deployed or previous being used")
+            client.login(config.TOKEN);
         }
-        client.login(config.TOKEN);
     }
 })
 

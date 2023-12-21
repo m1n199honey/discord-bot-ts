@@ -1,0 +1,34 @@
+import { Commands, config } from "../../init";
+import { SlashCommandBuilder, Client, ChatInputCommandInteraction, Message } from "discord.js";
+
+module.exports = function (client: Client | undefined) {
+  const Command = new SlashCommandBuilder()
+    .setName("commandname")
+    .setDescription("command description");
+
+  if (!client) return Command.toJSON();
+
+  Commands.set(Command.name, async (client: Client, arg: ChatInputCommandInteraction | Message) => {
+    if(arg instanceof Message) {
+      const message = arg as Message;
+      const user = message.author;
+      try {
+        await message.reply({ content: "Reply! For Message Command" });
+      } catch (error) {
+        console.error("Error sending DM:", error);
+        await message.reply({ content: "Failed to send DM. Please check your privacy settings or try again later." });
+        return;
+      }
+    } else if (arg.isChatInputCommand()){
+      const interaction = arg as ChatInputCommandInteraction;
+      const user = interaction.user;
+      try {
+        await interaction.reply({ content: "Reply! For Interaction Command" });
+      } catch (error) {
+        console.error("Error sending DM:", error);
+        await interaction.reply({ content: "Not Able to Execute Command!", ephemeral: true });
+        return;
+      }
+    }
+  });
+};
